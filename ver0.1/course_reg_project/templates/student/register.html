@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+
+{% block title %}수강신청 하기 | 수강신청 시스템{% endblock %}
+
+{% block content %}
+<div style="max-width: 1100px; margin: 0 auto; padding: 40px 0;">
+
+  <!-- 🔙 대시보드로 뒤로가기 -->
+  <a href="{{ url_for('student_dashboard') }}"
+     style="display:inline-flex; align-items:center; gap:6px;
+            color:#555; text-decoration:none; margin-bottom:18px;">
+    <span style="font-size:18px;">←</span>
+    <span style="font-size:14px;">대시보드로</span>
+  </a>
+
+  <!-- 타이틀 -->
+  <h1 style="font-size:28px; font-weight:700; margin:0 0 10px 0;">
+    {{ year }}년도 {{ term }} 수강신청
+  </h1>
+  <p style="color:#777; margin-bottom:18px; font-size:14px;">
+    현재 로그인한 학생 정보를 기준으로 수강 가능한 교과목을 조회합니다.
+  </p>
+
+  {% if error %}
+    <div style="background:#fff0f0; border:1px solid #f5b2b2;
+                padding:10px 14px; border-radius:8px;
+                color:#b00000; font-size:13px; margin-bottom:18px;">
+      {{ error }}
+    </div>
+  {% endif %}
+
+  <!-- 상단 학생 정보 -->
+  <div style="background:white; border-radius:16px;
+              box-shadow:0 6px 26px rgba(0,0,0,0.06);
+              padding:18px 22px; margin-bottom:24px;">
+
+    <div style="display:flex; flex-wrap:wrap; gap:16px; font-size:13px;">
+
+      <div>
+        <div style="color:#999; margin-bottom:3px;">학번</div>
+        <div style="font-weight:600;">{{ student.student_id }}</div>
+      </div>
+
+      <div>
+        <div style="color:#999; margin-bottom:3px;">이름</div>
+        <div style="font-weight:600;">{{ student.name }}</div>
+      </div>
+
+      <div>
+        <div style="color:#999; margin-bottom:3px;">학년 / 반</div>
+        <div style="font-weight:600;">
+          {{ grade }}학년
+          {% if class_no %}
+            &nbsp;{{ class_no }}반
+          {% endif %}
+        </div>
+      </div>
+
+      <div>
+        <div style="color:#999; margin-bottom:3px;">과정</div>
+        <div style="font-weight:600;">{{ student.program_type }}</div>
+      </div>
+
+      <div>
+        <div style="color:#999; margin-bottom:3px;">신청 학기</div>
+        <div style="font-weight:600;">{{ year }}년 {{ term }}</div>
+      </div>
+
+    </div>
+
+    <div style="margin-top:14px; font-size:12px; color:#888;">
+      ▪ 현재 학년·반(예: {{ grade }}학년{% if class_no %} {{ class_no }}반{% endif %})에 해당하는 강의가
+      목록 상단에 먼저 정렬됩니다.<br>
+      ▪ 그 다음 같은 학년의 다른 반 강의, 마지막으로 다른 학년 강의 순으로 표시됩니다.
+    </div>
+  </div>
+
+  <!-- 수강신청 가능 과목 목록 -->
+  <div style="background:white; border-radius:18px;
+              box-shadow:0 6px 26px rgba(0,0,0,0.05);
+              padding:20px 24px;">
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+      <h2 style="font-size:18px; margin:0;">수강신청 대상 교과목</h2>
+      <span style="font-size:12px; color:#777;">
+        총 {{ lectures|length }}개 강의
+      </span>
+    </div>
+
+    {% if lectures %}
+      <table style="width:100%; border-collapse:collapse; font-size:13px;">
+        <thead>
+          <tr style="border-bottom:2px solid #f1f1f1;">
+            <th style="text-align:left; padding:8px 4px;">과목ID</th>
+            <th style="text-align:left; padding:8px 4px;">과목명</th>
+            <th style="text-align:left; padding:8px 4px;">대상 학년/반</th>
+            <th style="text-align:left; padding:8px 4px;">요일/교시</th>
+            <th style="text-align:left; padding:8px 4px;">강의실</th>
+            <th style="text-align:left; padding:8px 4px;">담당교수</th>
+            <th style="text-align:center; padding:8px 4px; width:90px;">신청</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for lec in lectures %}
+          <tr style="border-bottom:1px solid #f5f5f5;">
+            <td style="padding:8px 4px;">
+              {{ lec.course_id }}
+            </td>
+
+            <td style="padding:8px 4px;">
+              {{ lec.course_name }}
+            </td>
+
+            <td style="padding:8px 4px;">
+              {% if lec.target_grade %}
+                {{ lec.target_grade }}학년
+              {% else %}
+                -
+              {% endif %}
+              {% if lec.class_no %}
+                &nbsp;{{ lec.class_no }}반
+              {% endif %}
+            </td>
+
+            <td style="padding:8px 4px;">
+              {{ lec.day_of_week }} {{ lec.start_period }}~{{ lec.end_period }}교시
+            </td>
+
+            <td style="padding:8px 4px;">
+              {{ lec.room_id }}
+              {% if lec.room_name %}
+                <span style="color:#666;"> ({{ lec.room_name }})</span>
+              {% endif %}
+            </td>
+
+            <td style="padding:8px 4px;">
+              {{ lec.prof_name or '-' }}
+            </td>
+
+            <td style="text-align:center; padding:8px 4px;">
+              {% if lec.lecture_id in registered_ids %}
+                <!-- ✅ 이미 신청된 강의면: 수강 완료 버튼 (비활성) -->
+                <button type="button"
+                        style="border:none; background:#e5e5e5; color:#666;
+                               padding:6px 12px; border-radius:999px;
+                               font-size:12px; cursor:default;">
+                  신청 완료
+                </button>
+              {% else %}
+                <!-- ✅ 아직 신청 안 한 강의면: 신청 버튼 -->
+                <form method="post" style="margin:0;">
+                  <input type="hidden" name="lecture_id" value="{{ lec.lecture_id }}">
+                  <button type="submit"
+                          style="border:none; background:#111; color:#fff;
+                                 padding:6px 12px; border-radius:999px;
+                                 font-size:12px; cursor:pointer;">
+                    신청
+                  </button>
+                </form>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p style="font-size:13px; color:#777; margin:4px 0 0 0;">
+        현재 수강신청 가능한 교과목이 없습니다.
+      </p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

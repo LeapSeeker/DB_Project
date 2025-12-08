@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}수강 정정 (분반 변경) | 수강신청 시스템{% endblock %}
+
+{% block content %}
+<div style="max-width: 900px; margin: 0 auto; padding: 40px 0;">
+
+  <!-- 뒤로가기 -->
+  <a href="{{ url_for('student_registrations') }}"
+     style="display:inline-flex; align-items:center; gap:6px;
+            text-decoration:none; color:#555; margin-bottom:18px;">
+    <span style="font-size:16px;">←</span>
+    <span style="font-size:14px;">신청한 교과목 목록으로</span>
+  </a>
+
+  <h1 style="font-size:26px; font-weight:700; margin:0 0 8px 0;">
+    수강 정정 (분반 변경)
+  </h1>
+  <p style="color:#777; margin-bottom:20px; font-size:14px;">
+    같은 과목(<strong>{{ current.course_name }}</strong>)의 다른 분반으로만 정정할 수 있습니다.
+  </p>
+
+  {% if error %}
+    <div style="background:#fff0f0; border:1px solid #f5b2b2;
+                padding:10px 14px; border-radius:8px;
+                color:#b00000; font-size:13px; margin-bottom:16px;">
+      {{ error }}
+    </div>
+  {% endif %}
+  {% if message %}
+    <div style="background:#f0fff4; border:1px solid #8fd19e;
+                padding:10px 14px; border-radius:8px;
+                color:#0b7a33; font-size:13px; margin-bottom:16px;">
+      {{ message }}
+    </div>
+  {% endif %}
+
+  <!-- 현재 신청된 분반 정보 -->
+  <div style="background:white; border-radius:14px;
+              box-shadow:0 4px 20px rgba(0,0,0,0.04);
+              padding:18px 20px; margin-bottom:24px;">
+    <h2 style="font-size:16px; margin:0 0 10px 0;">현재 신청 분반</h2>
+    <table style="width:100%; border-collapse:collapse; font-size:13px;">
+      <thead>
+      <tr style="border-bottom:1px solid #eee;">
+        <th style="text-align:left; padding:8px 4px;">강의ID</th>
+        <th style="text-align:left; padding:8px 4px;">요일/교시</th>
+        <th style="text-align:left; padding:8px 4px;">강의실</th>
+        <th style="text-align:left; padding:8px 4px;">담당교수</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+        <td style="padding:8px 4px;">{{ current.lecture_id }}</td>
+        <td style="padding:8px 4px;">
+          {{ current.day_of_week }} {{ current.start_period }}~{{ current.end_period }}교시
+        </td>
+        <td style="padding:8px 4px;">
+          {{ current.room_id }}
+          {% if current.room_name %}
+            <span style="color:#666;"> ({{ current.room_name }})</span>
+          {% endif %}
+        </td>
+        <td style="padding:8px 4px;">
+          {{ current.prof_name or '-' }}
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 변경 가능한 분반 목록 -->
+  <div style="background:white; border-radius:14px;
+              box-shadow:0 4px 20px rgba(0,0,0,0.04);
+              padding:18px 20px;">
+    <h2 style="font-size:16px; margin:0 0 10px 0;">변경 가능한 다른 분반</h2>
+
+    {% if alternatives %}
+      <form method="post">
+        <table style="width:100%; border-collapse:collapse; font-size:13px;">
+          <thead>
+          <tr style="border-bottom:1px solid #eee;">
+            <th style="padding:8px 4px; text-align:center;">선택</th>
+            <th style="padding:8px 4px; text-align:left;">강의ID</th>
+            <th style="padding:8px 4px; text-align:left;">요일/교시</th>
+            <th style="padding:8px 4px; text-align:left;">강의실</th>
+            <th style="padding:8px 4px; text-align:left;">담당교수</th>
+          </tr>
+          </thead>
+          <tbody>
+          {% for lec in alternatives %}
+            <tr style="border-bottom:1px solid #f5f5f5;">
+              <td style="text-align:center; padding:8px 4px;">
+                <input type="radio" name="new_lecture_id" value="{{ lec.lecture_id }}">
+              </td>
+              <td style="padding:8px 4px;">{{ lec.lecture_id }}</td>
+              <td style="padding:8px 4px;">
+                {{ lec.day_of_week }} {{ lec.start_period }}~{{ lec.end_period }}교시
+              </td>
+              <td style="padding:8px 4px;">
+                {{ lec.room_id }}
+                {% if lec.room_name %}
+                  <span style="color:#666;"> ({{ lec.room_name }})</span>
+                {% endif %}
+              </td>
+              <td style="padding:8px 4px;">{{ lec.prof_name or '-' }}</td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+
+        <div style="text-align:right; margin-top:16px;">
+          <button type="submit"
+                  style="border:none; background:#111; color:white;
+                         padding:9px 18px; border-radius:999px;
+                         font-size:13px; cursor:pointer;">
+            정정하기
+          </button>
+        </div>
+      </form>
+    {% else %}
+      <p style="font-size:13px; color:#777; margin:6px 0 0 0;">
+        정정 가능한 다른 분반이 없습니다.
+      </p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

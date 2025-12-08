@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}교수별 교과목 조회 | 수강신청 시스템{% endblock %}
+
+{% block content %}
+<div style="max-width: 900px; margin: 0 auto; padding: 40px 0;">
+
+  <a href="{{ url_for('staff_dashboard') }}"
+     style="display:flex; align-items:center; gap:6px; color:#555; margin-bottom:20px; text-decoration:none;">
+    <span style="font-size:18px;">←</span>
+    <span style="font-size:14px;">대시보드로</span>
+  </a>
+
+  <h1 style="font-size:24px; font-weight:700; margin:0 0 8px 0;">
+    교수별 교과목 조회
+  </h1>
+  <p style="color:#888; margin-bottom:20px;">
+    교수 한 명을 선택하면 담당 중인 교과목/분반 목록이 표시됩니다.
+  </p>
+
+  <div style="
+      background:white;
+      padding:20px;
+      border-radius:18px;
+      box-shadow:0 6px 30px rgba(0,0,0,0.06);
+      margin-bottom:20px;
+  ">
+    <form method="get" style="display:flex; gap:8px; align-items:center;">
+      <label for="prof_id" style="font-size:13px; color:#555;">교수 선택</label>
+      <select id="prof_id" name="prof_id"
+              style="flex:1; padding:8px 10px; border-radius:999px; border:1px solid #ddd;">
+        <option value="">교수를 선택하세요</option>
+        {% for p in professors %}
+          <option value="{{ p.prof_id }}"
+            {% if selected_prof_id == p.prof_id %}selected{% endif %}>
+            {{ p.name }} ({{ p.prof_id }})
+          </option>
+        {% endfor %}
+      </select>
+      <button type="submit"
+              style="padding:8px 16px; border:none; border-radius:999px; background:#111; color:white; font-size:13px; cursor:pointer;">
+        조회
+      </button>
+    </form>
+  </div>
+
+  {% if selected_prof_id %}
+  <div style="
+      background:white;
+      padding:20px;
+      border-radius:18px;
+      box-shadow:0 6px 30px rgba(0,0,0,0.06);
+  ">
+    {% if lectures %}
+      <table style="width:100%; border-collapse:collapse; font-size:13px;">
+        <thead>
+          <tr style="border-bottom:2px solid #eee; text-align:left;">
+            <th style="padding:10px 4px;">과목ID</th>
+            <th style="padding:10px 4px;">과목명</th>
+            <th style="padding:10px 4px;">강의ID</th>
+            <th style="padding:10px 4px;">요일/교시</th>
+            <th style="padding:10px 4px;">강의실</th>
+            <th style="padding:10px 4px;">과정</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for l in lectures %}
+          <tr style="border-bottom:1px solid #f5f5f5;">
+            <td style="padding:8px 4px;">{{ l.course_id }}</td>
+            <td style="padding:8px 4px;">{{ l.course_name }}</td>
+            <td style="padding:8px 4px;">{{ l.lecture_id }}</td>
+            <td style="padding:8px 4px;">{{ l.day_of_week }} {{ l.start_period }}~{{ l.end_period }}교시</td>
+            <td style="padding:8px 4px;">{{ l.room_id }}<br><span style="font-size:11px; color:#777;">{{ l.room_name }}</span></td>
+            <td style="padding:8px 4px;">{{ l.program_type }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p style="font-size:13px; color:#777; margin:0;">
+        해당 교수가 담당하는 강의가 없습니다.
+      </p>
+    {% endif %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

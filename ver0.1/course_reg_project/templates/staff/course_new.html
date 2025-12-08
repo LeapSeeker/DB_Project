@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block title %}교과목 추가 | 수강신청 시스템{% endblock %}
+
+{% block content %}
+  <div class="card-auth">
+    <a href="{{ url_for('staff_dashboard') }}" class="top-back">
+      <span class="top-back-icon">←</span>
+      <span>대시보드로</span>
+    </a>
+
+    <h1>교과목 추가</h1>
+    <p class="subtitle">
+      과목 정보와 강의 정보를 한 번에 등록합니다.
+    </p>
+
+    {% if error %}
+      <div class="error">{{ error }}</div>
+    {% endif %}
+    {% if message %}
+      <div style="color: #2e7d32; font-size: 13px; margin-bottom: 12px;">
+        {{ message }}
+      </div>
+    {% endif %}
+
+    <form method="post">
+      <div class="card" style="margin-bottom: 16px;">
+        <h3 style="margin-top:0; font-size:16px;">과목 정보</h3>
+
+        <div class="form-row">
+          <label for="course_id">과목ID</label>
+          <input type="text" id="course_id" name="course_id" placeholder="예: AI101">
+        </div>
+
+        <div class="form-row">
+          <label for="course_name">과목명</label>
+          <input type="text" id="course_name" name="course_name" placeholder="예: 인공지능개론">
+        </div>
+
+        <div class="form-row">
+          <label for="credit">학점</label>
+          <input type="number" id="credit" name="credit" min="1" max="5" value="3">
+        </div>
+
+        <div class="form-row">
+          <label for="min_grade">최소 이수 학년 (선택)</label>
+          <input type="number" id="min_grade" name="min_grade" min="1" max="4">
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 style="margin-top:0; font-size:16px;">강의 정보</h3>
+
+        <div class="form-row">
+          <label for="lecture_id">강의ID</label>
+          <input type="text" id="lecture_id" name="lecture_id" placeholder="예: L_AI_01">
+        </div>
+
+        <div class="form-row">
+          <label for="prof_id">담당 교수</label>
+          <select id="prof_id" name="prof_id">
+            <option value="">교수를 선택하세요</option>
+            {% for p in professors %}
+              <option value="{{ p.prof_id }}">{{ p.name }} ({{ p.prof_id }})</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-row">
+          <label for="room_id">강의실</label>
+          <select id="room_id" name="room_id">
+            <option value="">강의실을 선택하세요</option>
+            {% for r in rooms %}
+              <option value="{{ r.room_id }}">{{ r.room_id }} - {{ r.room_name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-row">
+          <label for="day_of_week">요일</label>
+          <select id="day_of_week" name="day_of_week">
+            <option value="월">월</option>
+            <option value="화">화</option>
+            <option value="수">수</option>
+            <option value="목">목</option>
+            <option value="금">금</option>
+            <option value="토">토</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <label for="start_period">시작 교시</label>
+          <input type="number" id="start_period" name="start_period" min="1" max="9" value="1">
+        </div>
+
+        <div class="form-row">
+          <label for="end_period">종료 교시</label>
+          <input type="number" id="end_period" name="end_period" min="1" max="9" value="2">
+        </div>
+
+        <div class="form-row">
+          <label for="program_type">과정구분</label>
+          <select id="program_type" name="program_type">
+            <option value="전문학사">전문학사</option>
+            <option value="전공심화">전공심화</option>
+            <option value="P-TECH">P-TECH</option>
+          </select>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-primary" style="margin-top: 16px;">
+        교과목 등록
+      </button>
+    </form>
+  </div>
+
+  <script>
+    // 과목ID 입력 후 포커스를 잃었을 때(blur) 자동 조회
+    document.addEventListener("DOMContentLoaded", function () {
+      const courseIdInput   = document.getElementById("course_id");
+      const nameInput       = document.getElementById("course_name");
+      const creditInput     = document.getElementById("credit");
+      const minGradeInput   = document.getElementById("min_grade");
+
+      courseIdInput.addEventListener("blur", function () {
+        const cid = courseIdInput.value.trim();
+        if (!cid) return;
+
+        fetch(`/api/course/${encodeURIComponent(cid)}`)
+          .then(res => res.json())
+          .then(data => {
+            if (data.exists) {
+              // 기존 과목인 경우: 값 자동 채우고 잠금
+              nameInput.value     = data.course_name || "";
+              creditInput.value   = data.credit ?? "";
+              minGradeInput.value = data.min_grade ?? "";
+
+              nameInput.readOnly     = true;
+              creditInput.readOnly   = true;
+              minGradeInput.readOnly = true;
+
+              // 필요하면 안내 문구도 띄우기
+              console.log("기존 과목입니다. 분반만 추가합니다.");
+            } else {
+              // 새 과목인 경우: 입력 가능하게 초기화
+              nameInput.value     = "";
+              creditInput.value   = "";
+              minGradeInput.value = "";
+
+              nameInput.readOnly     = false;
+              creditInput.readOnly   = false;
+              minGradeInput.readOnly = false;
+
+              console.log("새 과목입니다. 과목 정보를 입력하세요.");
+            }
+          })
+          .catch(err => {
+            console.error(err);
+          });
+      });
+    });
+  </script>
+{% endblock %}

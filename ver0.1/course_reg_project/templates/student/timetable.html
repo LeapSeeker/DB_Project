@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block title %}학생 시간표 | 수강신청 시스템{% endblock %}
+
+{% block content %}
+<style>
+  /* 시간표 전체 테이블 스타일 */
+  .tt-table {
+    width: 100%;
+    min-width: 700px;
+    border-collapse: collapse;
+    font-size: 12px;
+    table-layout: fixed; /* 칸 너비 일정하게 */
+  }
+
+  .tt-table th,
+  .tt-table td {
+    padding: 10px 8px;
+    height: 56px;              /* 한 줄 높이 고정 */
+    vertical-align: middle;    /* 세로 가운데 정렬 */
+    border-right: 1px solid #f0f0f0;
+    border-bottom: 1px solid #f5f5f5;
+    word-break: keep-all;
+    overflow: hidden;
+  }
+
+  .tt-table thead th {
+    background: #fafafa;
+    font-weight: 600;
+  }
+
+  .tt-slot-title {
+    font-weight: 600;
+    font-size: 12px;
+  }
+
+  .tt-slot-sub {
+    font-size: 11px;
+    color: #666;
+    margin-top: 2px;
+  }
+
+  .tt-col-header {
+    text-align: center;
+    white-space: nowrap;
+  }
+</style>
+
+<div style="max-width: 1100px; margin: 0 auto; padding: 40px 0;">
+
+  <!-- 🔙 뒤로가기(대시보드로) -->
+  <a href="{{ url_for('student_dashboard') }}"
+     style="display:inline-flex; align-items:center; gap:6px;
+            padding:6px 12px; border-radius:999px;
+            border:1px solid #ddd; font-size:13px;
+            color:#555; text-decoration:none; margin-bottom:16px;">
+    <span style="font-size:16px;">←</span>
+    <span>대시보드로</span>
+  </a>
+
+  <h1 style="font-size:24px; font-weight:700; margin:0 0 6px 0;">
+    학생별 시간표
+  </h1>
+
+  {% if student %}
+  <p style="color:#888; margin-bottom:18px;">
+    {{ student.name }}({{ student.student_id }}) · {{ student.grade }}학년 · {{ student.program_type }}
+  </p>
+  {% endif %}
+
+  {% set days = ["월","화","수","목","금","토"] %}
+
+  <div style="
+      background:white;
+      padding:20px;
+      border-radius:18px;
+      box-shadow:0 6px 30px rgba(0,0,0,0.06);
+  ">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+      <span style="font-size:13px; color:#777;">
+        수강신청한 교과목 기준으로 자동 생성된 시간표입니다.
+      </span>
+    </div>
+
+    <div style="overflow-x:auto;">
+      <table class="tt-table">
+        <thead>
+          <tr>
+            <th class="tt-col-header">교시/요일</th>
+            {% for d in days %}
+              <th class="tt-col-header">{{ d }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in range(1, max_period + 1) %}
+          <tr>
+            <!-- 교시 표시 -->
+            <th class="tt-col-header">
+              {{ p }}교시
+            </th>
+
+            <!-- 요일별 칸 -->
+            {% for d in days %}
+            <td>
+              {% for r in regs %}
+                {% if r.day_of_week == d and r.start_period <= p and r.end_period >= p %}
+                  <div>
+                    <div class="tt-slot-title">
+                      {{ r.course_name }}
+                    </div>
+                    <div class="tt-slot-sub">
+                      {{ r.room_id }} · {{ r.prof_name }}
+                    </div>
+                  </div>
+                {% endif %}
+              {% endfor %}
+            </td>
+            {% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {% if not regs or regs|length == 0 %}
+      <p style="font-size:12px; color:#777; margin-top:10px;">
+        아직 신청한 교과목이 없어 시간표가 비어 있습니다.
+      </p>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}

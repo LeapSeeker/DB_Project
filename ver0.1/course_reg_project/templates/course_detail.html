@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block title %}교과목 상세 정보 | 수강신청 시스템{% endblock %}
+
+{% block content %}
+<div style="max-width: 900px; margin: 0 auto; padding: 40px 0;">
+
+  <!-- 닫기(목록으로) 버튼 -->
+  <a href="{{ url_for('staff_courses') }}"
+     style="display:inline-flex; align-items:center; gap:6px;
+            color:#555; text-decoration:none; margin-bottom:18px;">
+    <span style="font-size:18px;">←</span>
+    <span style="font-size:14px;">교과목 목록으로</span>
+  </a>
+
+  <!-- 제목 -->
+  <h1 style="font-size:24px; font-weight:700; margin:0 0 6px 0;">
+    {{ lecture.course_name }} ({{ lecture.course_id }})
+  </h1>
+  <p style="color:#777; margin-bottom:20px; font-size:13px;">
+    강의ID <b>{{ lecture.lecture_id }}</b> 상세 정보입니다.
+  </p>
+
+  <!-- 강의 기본 정보 카드 -->
+  <div style="background:white; border-radius:18px;
+              box-shadow:0 6px 30px rgba(0,0,0,0.06);
+              padding:20px 22px; margin-bottom:24px;">
+    <h2 style="font-size:16px; margin:0 0 12px 0;">강의 정보</h2>
+
+    <table style="width:100%; border-collapse:collapse; font-size:13px;">
+      <tbody>
+        <tr>
+          <th style="text-align:left; padding:6px 4px; width:120px; color:#666;">과목ID</th>
+          <td style="padding:6px 4px;">{{ lecture.course_id }}</td>
+        </tr>
+        <tr>
+          <th style="text-align:left; padding:6px 4px; color:#666;">강의ID</th>
+          <td style="padding:6px 4px;">{{ lecture.lecture_id }}</td>
+        </tr>
+        <tr>
+          <th style="text-align:left; padding:6px 4px; color:#666;">담당 교수</th>
+          <td style="padding:6px 4px;">{{ lecture.prof_name or '-' }}</td>
+        </tr>
+        <tr>
+          <th style="text-align:left; padding:6px 4px; color:#666;">요일/교시</th>
+          <td style="padding:6px 4px;">
+            {{ lecture.day_of_week }} {{ lecture.start_period }}~{{ lecture.end_period }}교시
+          </td>
+        </tr>
+        <tr>
+          <th style="text-align:left; padding:6px 4px; color:#666;">강의실</th>
+          <td style="padding:6px 4px;">
+            {{ lecture.building }} / {{ lecture.room_id }}
+            {% if lecture.room_name %}
+              <span style="color:#777;"> ({{ lecture.room_name }})</span>
+            {% endif %}
+          </td>
+        </tr>
+        <tr>
+          <th style="text-align:left; padding:6px 4px; color:#666;">과정 / 프로그램</th>
+          <td style="padding:6px 4px;">{{ lecture.program_type or '-' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 신청 학생 목록 -->
+  <div style="background:white; border-radius:18px;
+              box-shadow:0 6px 30px rgba(0,0,0,0.06);
+              padding:20px 22px;">
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+      <h2 style="font-size:16px; margin:0;">신청 학생 목록</h2>
+      <span style="font-size:12px; color:#777;">
+        총 {{ students|length }}명
+      </span>
+    </div>
+
+    {% if students %}
+      <table style="width:100%; border-collapse:collapse; font-size:13px;">
+        <thead>
+          <tr style="border-bottom:2px solid #eee; text-align:left;">
+            <th style="padding:8px 4px;">학번</th>
+            <th style="padding:8px 4px;">이름</th>
+            <th style="padding:8px 4px;">학년</th>
+            <th style="padding:8px 4px;">과정</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for s in students %}
+          <tr style="border-bottom:1px solid #f5f5f5;">
+            <td style="padding:8px 4px;">{{ s.student_id }}</td>
+            <td style="padding:8px 4px;">{{ s.name }}</td>
+            <td style="padding:8px 4px;">{{ s.grade }}학년</td>
+            <td style="padding:8px 4px;">{{ s.program_type }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p style="font-size:13px; color:#777; margin:0;">
+        아직 이 강의를 신청한 학생이 없습니다.
+      </p>
+    {% endif %}
+  </div>
+
+  <!-- 하단 닫기 버튼 -->
+  <div style="text-align:center; margin-top:20px;">
+    <a href="{{ url_for('staff_courses') }}"
+       style="display:inline-block; padding:8px 18px;
+              border-radius:999px; border:1px solid #ddd;
+              font-size:13px; color:#333; text-decoration:none;">
+      닫기
+    </a>
+  </div>
+
+</div>
+{% endblock %}

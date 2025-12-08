@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}교과목 수정 | 수강신청 시스템{% endblock %}
+
+{% block content %}
+  <div class="card-auth">
+    <a href="{{ url_for('staff_courses') }}" class="top-back">
+      <span class="top-back-icon">←</span>
+      <span>교과목 목록으로</span>
+    </a>
+
+    <h1>교과목 수정</h1>
+    <p class="subtitle">
+      과목 및 강의 정보를 수정합니다.
+    </p>
+
+    {% if error %}
+      <div class="error">{{ error }}</div>
+    {% endif %}
+    {% if message %}
+      <div style="color:#2e7d32; font-size:13px; margin-bottom:12px;">
+        {{ message }}
+      </div>
+    {% endif %}
+
+    <form method="post">
+      <div class="card" style="margin-bottom: 16px;">
+        <h3 style="margin-top:0; font-size:16px;">과목 정보</h3>
+
+        <div class="form-row">
+          <label for="course_id">과목ID</label>
+          <input type="text" id="course_id" name="course_id"
+                 value="{{ detail.course_id }}" readonly>
+        </div>
+
+        <div class="form-row">
+          <label for="course_name">과목명</label>
+          <input type="text" id="course_name" name="course_name"
+                 value="{{ detail.course_name }}">
+        </div>
+
+        <div class="form-row">
+          <label for="credit">학점</label>
+          <input type="number" id="credit" name="credit"
+                 min="1" max="5" value="{{ detail.credit }}">
+        </div>
+
+        <div class="form-row">
+          <label for="min_grade">최소 이수 학년 (선택)</label>
+          <input type="number" id="min_grade" name="min_grade"
+                 min="1" max="4" value="{{ detail.min_grade or '' }}">
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 style="margin-top:0; font-size:16px;">강의 정보</h3>
+
+        <div class="form-row">
+          <label>강의ID</label>
+          <input type="text" value="{{ detail.lecture_id }}" disabled>
+        </div>
+
+        <div class="form-row">
+          <label for="prof_id">담당 교수</label>
+          <select id="prof_id" name="prof_id">
+            {% for p in professors %}
+              <option value="{{ p.prof_id }}"
+                {% if p.prof_id == detail.prof_id %}selected{% endif %}>
+                {{ p.name }} ({{ p.prof_id }})
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-row">
+          <label for="room_id">강의실</label>
+          <select id="room_id" name="room_id">
+            {% for r in rooms %}
+              <option value="{{ r.room_id }}"
+                {% if r.room_id == detail.room_id %}selected{% endif %}>
+                {{ r.room_id }} - {{ r.room_name }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-row">
+          <label for="day_of_week">요일</label>
+          <select id="day_of_week" name="day_of_week">
+            {% for d in ['월','화','수','목','금','토'] %}
+              <option value="{{ d }}"
+                {% if d == detail.day_of_week %}selected{% endif %}>{{ d }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-row">
+          <label for="start_period">시작 교시</label>
+          <input type="number" id="start_period" name="start_period"
+                 min="1" max="9" value="{{ detail.start_period }}">
+        </div>
+
+        <div class="form-row">
+          <label for="end_period">종료 교시</label>
+          <input type="number" id="end_period" name="end_period"
+                 min="1" max="9" value="{{ detail.end_period }}">
+        </div>
+
+        <div class="form-row">
+          <label for="program_type">과정구분</label>
+          <select id="program_type" name="program_type">
+            {% for t in ['전문학사','전공심화','P-TECH'] %}
+              <option value="{{ t }}"
+                {% if t == detail.program_type %}selected{% endif %}>{{ t }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-primary" style="margin-top:16px;">
+        수정 저장
+      </button>
+    </form>
+  </div>
+{% endblock %}

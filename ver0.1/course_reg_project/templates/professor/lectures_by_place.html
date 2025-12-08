@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}건물/강의실별 내 강의 | 수강신청 시스템{% endblock %}
+
+{% block content %}
+<div style="max-width: 900px; margin: 0 auto; padding: 40px 0;">
+
+  <a href="{{ url_for('prof_dashboard') }}"
+     style="display:flex; align-items:center; gap:6px; color:#555; margin-bottom:20px; text-decoration:none;">
+    <span style="font-size:18px;">←</span>
+    <span style="font-size:14px;">대시보드로</span>
+  </a>
+
+  <h1 style="font-size:24px; font-weight:700; margin:0 0 8px 0;">
+    건물 / 강의실별 내 강의
+  </h1>
+  <p style="color:#888; margin-bottom:20px;">
+    건물 또는 강의실을 기준으로 {{ prof.name }} 교수님의 강의 목록을 조회합니다.
+  </p>
+
+  <!-- 조건 선택 카드 -->
+  <div style="
+      background:white;
+      padding:20px;
+      border-radius:18px;
+      box-shadow:0 6px 30px rgba(0,0,0,0.06);
+      margin-bottom:20px;
+  ">
+    <form method="get" style="display:flex; flex-direction:column; gap:12px;">
+
+      <div style="display:flex; gap:8px; align-items:center;">
+        <label for="building" style="font-size:13px; color:#555; width:80px;">건물</label>
+        <select id="building" name="building"
+                style="flex:1; padding:8px 10px; border-radius:999px; border:1px solid #ddd;">
+          <option value="">(선택 안 함)</option>
+          {% for b in buildings %}
+            <option value="{{ b.building }}"
+              {% if selected_building == b.building %}selected{% endif %}>
+              {{ b.building }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div style="display:flex; gap:8px; align-items:center;">
+        <label for="room_id" style="font-size:13px; color:#555; width:80px;">강의실</label>
+        <select id="room_id" name="room_id"
+                style="flex:1; padding:8px 10px; border-radius:999px; border:1px solid #ddd;">
+          <option value="">(선택 안 함)</option>
+          {% for r in rooms %}
+            <option value="{{ r.room_id }}"
+              {% if selected_room_id == r.room_id %}selected{% endif %}>
+              {{ r.room_id }} - {{ r.room_name }} ({{ r.building }})
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div style="display:flex; gap:8px; justify-content:flex-end;">
+        <button type="submit"
+                style="padding:8px 16px; border:none; border-radius:999px; background:#111; color:white; font-size:13px; cursor:pointer;">
+          조회
+        </button>
+      </div>
+    </form>
+
+    <p style="font-size:11px; color:#999; margin-top:8px;">
+      강의실을 선택하면 건물 선택보다 우선 적용됩니다.
+    </p>
+  </div>
+
+  <!-- 결과 카드 -->
+  {% if selected_building or selected_room_id %}
+  <div style="
+      background:white;
+      padding:20px;
+      border-radius:18px;
+      box-shadow:0 6px 30px rgba(0,0,0,0.06);
+  ">
+    <p style="font-size:13px; color:#666; margin:0 0 10px 0;">
+      검색 조건:
+      {% if selected_room_id %}
+        <b>강의실 {{ selected_room_id }}</b>
+      {% elif selected_building %}
+        <b>{{ selected_building }}</b> 건물
+      {% endif %}
+      {% if lectures %}
+        · 총 <b>{{ lectures|length }}개</b> 강의
+      {% endif %}
+    </p>
+
+    {% if lectures %}
+      <table style="width:100%; border-collapse:collapse; font-size:13px;">
+        <thead>
+          <tr style="border-bottom:2px solid #eee; text-align:left;">
+            <th style="padding:10px 4px;">과목ID</th>
+            <th style="padding:10px 4px;">과목명</th>
+            <th style="padding:10px 4px;">강의ID</th>
+            <th style="padding:10px 4px;">요일/교시</th>
+            <th style="padding:10px 4px;">강의실</th>
+            <th style="padding:10px 4px;">과정</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for l in lectures %}
+          <tr style="border-bottom:1px solid #f5f5f5;">
+            <td style="padding:8px 4px;">{{ l.course_id }}</td>
+            <td style="padding:8px 4px;">{{ l.course_name }}</td>
+            <td style="padding:8px 4px;">{{ l.lecture_id }}</td>
+            <td style="padding:8px 4px;">{{ l.day_of_week }} {{ l.start_period }}~{{ l.end_period }}교시</td>
+            <td style="padding:8px 4px;">
+              {{ l.building }}<br>
+              {{ l.room_id }} / <span style="font-size:11px; color:#777;">{{ l.room_name }}</span>
+            </td>
+            <td style="padding:8px 4px;">{{ l.program_type }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p style="font-size:13px; color:#777; margin:0;">
+        조건에 해당하는 강의가 없습니다.
+      </p>
+    {% endif %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

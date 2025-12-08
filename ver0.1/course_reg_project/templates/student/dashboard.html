@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}학생 대시보드 | 수강신청 시스템{% endblock %}
+
+{% block content %}
+<div style="max-width: 900px; margin: 0 auto; padding: 40px 0;">
+
+  <h1 style="font-size:28px; font-weight:700; margin:0 0 8px 0;">
+    학생 대시보드
+  </h1>
+
+  {% if student %}
+  <p style="color:#888; margin-bottom:24px;">
+    {{ student.name }}({{ student.student_id }}) 님의 수강신청 현황입니다.
+  </p>
+  {% endif %}
+
+  <!-- 위: 요약 카드 -->
+  <div style="
+      background:white;
+      padding:18px 20px;
+      border-radius:14px;
+      box-shadow:0 4px 20px rgba(0,0,0,0.05);
+      margin-bottom:24px;
+      font-size:13px;
+      color:#444;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+  ">
+    <div>
+      <div style="color:#999; font-size:12px;">신청 교과목 수</div>
+      <div style="font-size:18px; font-weight:700;">{{ reg_count }}개</div>
+      {% if student %}
+      <div style="margin-top:6px; font-size:13px;">
+        {{ student.grade }}학년 · {{ student.program_type }}
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- 시간표 조회 버튼 (새 창/탭 열기) -->
+    <div>
+      <a href="{{ url_for('student_timetable') }}"
+         target="_blank"
+         style="
+           display:inline-block;
+           padding:8px 14px;
+           border-radius:999px;
+           border:1px solid #111;
+           font-size:13px;
+           color:#111;
+           text-decoration:none;
+         ">
+        시간표 조회
+      </a>
+    </div>
+  </div>
+
+  <!-- 아래: 기능 카드 두 개만 -->
+  <div style="
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap:16px;
+  ">
+
+    <div style="
+        background:white;
+        padding:20px;
+        border-radius:18px;
+        box-shadow:0 6px 30px rgba(0,0,0,0.06);
+    ">
+      <h2 style="font-size:18px; margin:0 0 6px 0;">신청한 교과목 조회</h2>
+      <p style="font-size:13px; color:#666; margin:0 0 14px 0;">
+        현재 신청한 교과목 목록과 취소 기능을 볼 수 있습니다.
+      </p>
+      <a href="{{ url_for('student_registrations') }}"
+         style="
+           display:inline-block;
+           padding:8px 16px;
+           border-radius:999px;
+           background:#111;
+           color:white;
+           font-size:13px;
+           text-decoration:none;
+         ">
+        내 수강신청 보기
+      </a>
+    </div>
+
+    <div style="
+        background:white;
+        padding:20px;
+        border-radius:18px;
+        box-shadow:0 6px 30px rgba(0,0,0,0.06);
+    ">
+      <h2 style="font-size:18px; margin:0 0 6px 0;">수강신청 하기</h2>
+      <p style="font-size:13px; color:#666; margin:0 0 14px 0;">
+        개설 교과목 목록에서 수강신청을 할 수 있습니다.
+      </p>
+      <a href="{{ url_for('student_register') }}"
+         style="
+           display:inline-block;
+           padding:8px 16px;
+           border-radius:999px;
+           border:1px solid #111;
+           color:#111;
+           font-size:13px;
+           text-decoration:none;
+         ">
+        수강신청 화면으로
+      </a>
+    </div>
+
+  </div>
+
+  <div style="margin-top:24px; text-align:right;">
+    <a href="{{ url_for('logout') }}"
+       style="font-size:13px; color:#999; text-decoration:none;">
+      로그아웃
+    </a>
+  </div>
+</div>
+{% endblock %}
