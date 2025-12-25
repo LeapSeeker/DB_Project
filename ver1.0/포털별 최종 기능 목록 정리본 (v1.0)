@@ -160,3 +160,20 @@ B. 관계자(교수/교직원) 서비스 영역
     - 휴학, 제적, 졸업 등 정상 재학 상태가 아닌 학생은 수강신청 서비스 이용이 불가능합니다.
 - 연쇄 데이터 처리
     - 수강 취소 또는 폐강 시, 해당 강의와 연결된 출석부 데이터와 LMS 학습 그룹에서 해당 학생의 정보가 실시간으로 동기화되어 삭제되어야 합니다.
+
+-- 사용 기술 스택 --
+
+Tech Stack & Tools
+
+- Backend: Spring Boot 3.x
+	- Ai(Gemini, GPT)를 활용하여 정석적인 계층형
+			아키텍쳐(Controller-Service-Repository)구현
+
+- Database: MySQL 8.0
+	- 가장 숙련된 RDBMS를 선택하여 데이터 무결성과 복잡한 Join쿼리(교수별 시간표 등) 최적화에 집중
+
+- Concurrency Control: Redis
+	- 도전 과제: 자료구조 'Queue'의 원리를 실무 도구인 Redis에 대입하여 선착순 대기열 시스템 구현
+
+- IDE & Ai: VS Code / Gemini & GPT
+	- Ai를 단순 코드 생성이 아닌 설계 검토 및 트러블슈팅 파트너로 활용하여 개발 생상성 극대화
